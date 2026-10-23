@@ -1,0 +1,26 @@
+[
+  {
+    "version": "next",
+    "canonicalRef": "master",
+    "fixtureRef": "docs/admin-api-master-contract",
+    "commit": "1bb7dfd05b74e12ec684426511f93d5d4211bad6"
+  },
+  {
+    "version": "3.18",
+    "canonicalRef": "release/3.18",
+    "fixtureRef": "docs/admin-api-openapi-3.18",
+    "commit": "a75bf3764d1e9b8aedddb345644b56dab58cc06e"
+  },
+  {
+    "version": "3.17",
+    "canonicalRef": "release/3.17",
+    "fixtureRef": "docs/admin-api-openapi-3.17",
+    "commit": "52c7868bd88e1d74762ee35f3531c564e5ceb20e"
+  },
+  {
+    "version": "3.16",
+    "canonicalRef": "release/3.16",
+    "fixtureRef": "docs/admin-api-openapi-3.16",
+    "commit": "006776e3cb0fbf5ce19f7cd166c422294b45b135"
+  }
+]

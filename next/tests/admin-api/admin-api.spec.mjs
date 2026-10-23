@@ -1,11 +1,12 @@
+/* eslint-disable no-await-in-loop -- Each search dialog must close before the next shortcut. */
 import { test, expect } from '@playwright/test';
 
 // Run against the combined production output, including Docusaurus archives.
 // Do not substitute another release's JSON: success is a readiness check for
 // the canonical sources, while interception below tests failure recovery.
 const versions = ['', 'next/', '3.18/', '3.17/', '3.16/'];
-for (const locale of ['', '/zh']) {
-  for (const version of versions) {
+['', '/zh'].forEach((locale) => {
+  versions.forEach((version) => {
     const route = `${locale}/docs/apisix/${version}admin-api/`;
     test(`${route} renders, downloads, switches versions and owns the search shortcut`, async ({ page }) => {
       test.setTimeout(60000);
@@ -30,6 +31,8 @@ for (const locale of ['', '/zh']) {
       await expect(page.locator('.api-version a', { hasText: '3.18' })).toHaveAttribute('href', `${locale}/docs/apisix/3.18/admin-api/`);
       await page.keyboard.press('Escape');
       await expect(page.locator('.api-version')).not.toHaveAttribute('open', '');
+      // Search dialogs must be opened and closed sequentially.
+      // eslint-disable-next-line no-restricted-syntax
       for (const shortcut of ['Control+k', 'Meta+k']) {
         await page.keyboard.press(shortcut);
         await expect(page.locator('.scalar-modal-layout')).toHaveCount(1);
@@ -38,7 +41,10 @@ for (const locale of ['', '/zh']) {
         await expect(page.locator('.scalar-modal-layout')).toHaveCount(1);
         await page.keyboard.press('Escape');
       }
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+      const hasNoOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+      );
+      expect(hasNoOverflow).toBeTruthy();
       const destination = version === '3.18/' ? '3.17' : '3.18';
       await page.locator('.api-version summary').click();
       await page.locator(`.api-version a[href="${locale}/docs/apisix/${destination}/admin-api/"]`).click();
@@ -55,7 +61,7 @@ for (const locale of ['', '/zh']) {
       await context.close();
     });
 
-    for (const mode of ['missing', 'invalid-json', 'invalid-spec', 'network', 'timeout', 'scalar-script']) {
+    ['missing', 'invalid-json', 'invalid-spec', 'network', 'timeout', 'scalar-script'].forEach((mode) => {
       test(`${route} restores Markdown on ${mode}`, async ({ page }) => {
         if (mode === 'timeout') await page.clock.install();
         if (mode === 'scalar-script') {
@@ -77,8 +83,11 @@ for (const locale of ['', '/zh']) {
         }
         await expect(page.locator('#admin-api-markdown')).toBeVisible({ timeout: 16000 });
         await expect(page.locator('#admin-api-openapi')).toBeHidden();
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+        const hasNoOverflow = await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+        );
+        expect(hasNoOverflow).toBeTruthy();
       });
-    }
-  }
-}
+    });
+  });
+});

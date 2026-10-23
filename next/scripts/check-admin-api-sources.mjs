@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- This CLI prints validation evidence. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -7,11 +8,12 @@ import { isAdminApiSpec } from '../../shared/admin-api-spec.ts';
 
 const require = createRequire(import.meta.url);
 const { versions } = require('../../config/apisix-versions.js');
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const assets = process.argv[2] ?? path.join(root, 'doc/static/assets/openapi/apisix');
 const required = [...versions.slice(versions.indexOf('3.16')), 'next'];
 let failed = false;
-for (const version of required) {
+required.forEach((version) => {
   const ref = version === 'next' ? 'master' : `release/${version}`;
   const source = `apache/apisix@${ref}/docs/en/latest/admin-api.json`;
   try {
@@ -22,5 +24,5 @@ for (const version of required) {
     failed = true;
     console.error(`BLOCKED ${source}: ${error.code === 'ENOENT' ? 'missing synced source' : error.message}`);
   }
-}
+});
 if (failed) process.exitCode = 1;

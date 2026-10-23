@@ -11,9 +11,9 @@ test('accepts patch releases and development versions without crossing release s
 });
 
 test('rejects malformed documents without throwing', () => {
-  for (const spec of [null, [], {}, { openapi: 3 },
+  [null, [], {}, { openapi: 3 },
     { openapi: '3.1.0', info: { title: 'Admin API', version: '3.18.0' }, paths: null },
-    { openapi: '3.1.0', info: { title: 'Admin API', version: '3.18.0' }, paths: [] }]) {
+    { openapi: '3.1.0', info: { title: 'Admin API', version: '3.18.0' }, paths: [] }].forEach((spec) => {
     assert.equal(isAdminApiSpec(spec, '3.18'), false);
-  }
+  });
 });
